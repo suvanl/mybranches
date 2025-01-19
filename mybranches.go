@@ -25,6 +25,10 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if len(m.branches) == 0 {
+		return m, tea.Quit
+	}
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -66,6 +70,10 @@ func (m model) View() string {
 			builder.WriteString(deselectedIndicator + " ")
 		}
 		builder.WriteString(m.branches[i])
+		if getCurrentBranchName() == m.branches[i] {
+			builder.WriteString(" (current)")
+		}
+
 		builder.WriteString("\n")
 	}
 
@@ -115,7 +123,8 @@ func getCurrentBranchName() string {
 		log.Fatalf("Error getting current branch: %v", err)
 	}
 
-	return string(out[:])
+	fromBytes := string(out[:])
+	return strings.Split(fromBytes, "\n")[0]
 }
 
 // Returns the output of the `git switch` command
