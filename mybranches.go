@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/user"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -54,7 +55,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 //
 // There's no need to implement redrawing logic - bubbletea takes care of redrawing for us.
 func (m model) View() string {
-	s := "Branches containing '<pattern>'\n\n"
+	s := fmt.Sprintf("Branches containing '%s'\n\n", getUsernamePattern())
 
 	for i, branch := range m.branches {
 		// Render cursor if the current item is selected
@@ -91,4 +92,19 @@ func initialState() model {
 		branches: []string{"sample1", "idk", "suvan/test_new"},
 		selected: make(map[int]struct{}),
 	}
+}
+
+func getUsernamePattern() string {
+	user, err := user.Current()
+
+	if err != nil {
+		defaultUsername := "user"
+		fmt.Printf("Failed to determine your username. Defaulting to %s.", defaultUsername)
+		return defaultUsername
+	}
+
+	// The usage in mind is that branches will be named "<name>/mybranchname", but there's a chance
+	// another char, such as `-` may be commonplace too, so we'll return the username without any
+	// trailing chars for now.
+	return user.Username
 }
