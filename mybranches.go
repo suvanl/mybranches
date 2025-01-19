@@ -120,9 +120,9 @@ func getUsernamePattern() string {
 		return defaultUsername
 	}
 
-	// The usage in mind is that branches will be named "<name>/mybranchname", but there's a chance
-	// another char, such as `-` may be commonplace too, so we'll return the username without any
-	// trailing chars for now.
+	// Different branch naming conventions exist, but all usually start with the author's name.
+	// The character after this often differs (":", "/", "-" are commonly used), so we won't include it in default pattern.
+	// If needed, it can be included in the value provided for the `--pattern` flag.
 	return user.Username
 }
 
