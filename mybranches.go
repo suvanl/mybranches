@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -138,9 +139,17 @@ func switchBranch(branchName string) string {
 }
 
 func main() {
-	pattern := getUsernamePattern()
-	branches := findBranches(pattern)
+	patternFlag := flag.String("pattern", getUsernamePattern(), "Custom pattern to use. Defaults to your username.")
+	flag.Parse()
 
+	pattern := *patternFlag
+
+	if strings.TrimSpace(pattern) == "" {
+		fmt.Println("pattern flag cannot be blank")
+		return
+	}
+
+	branches := findBranches(pattern)
 	if len(branches) == 0 {
 		fmt.Printf("Couldn't find any branches containing '%s'\n", pattern)
 		return
