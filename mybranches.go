@@ -142,14 +142,16 @@ func main() {
 	patternFlag := flag.String("pattern", getUsernamePattern(), "Custom pattern to use. Defaults to your username.")
 	flag.Parse()
 
-	if strings.TrimSpace(*patternFlag) == "" {
+	pattern := *patternFlag
+
+	if strings.TrimSpace(pattern) == "" {
 		fmt.Println("pattern flag cannot be blank")
 		return
 	}
 
-	branches := findBranches(*patternFlag)
+	branches := findBranches(pattern)
 	if len(branches) == 0 {
-		fmt.Printf("Couldn't find any branches containing '%s'\n", *patternFlag)
+		fmt.Printf("Couldn't find any branches containing '%s'\n", pattern)
 		return
 	}
 
