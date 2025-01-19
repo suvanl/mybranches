@@ -15,6 +15,8 @@ type model struct {
 	branches    []string
 	cursorIndex int
 	selected    map[int]struct{}
+	switching   bool
+	switchMsg   string
 }
 
 func (m model) Init() tea.Cmd {
@@ -47,6 +49,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				delete(m.selected, m.cursorIndex)
 			} else {
 				m.selected[m.cursorIndex] = struct{}{}
+
+				// Switch to the selected branch
+				m.switching = true
+				out := switchBranch(m.branches[m.cursorIndex])
+				m.switchMsg = out
+				return m, tea.Quit
 			}
 		}
 	}
@@ -59,6 +67,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 // There's no need to implement redrawing logic - bubbletea takes care of redrawing for us.
 func (m model) View() string {
 	s := fmt.Sprintf("Branches containing '%s'\n\n", getUsernamePattern())
+
+	if m.switching {
+		return m.switchMsg
+	}
 
 	for i, branch := range m.branches {
 		// Render cursor if the current item is selected
@@ -119,9 +131,28 @@ func findBranches(pattern string) []string {
 		log.Fatalf("Error finding branches: %v", err)
 	}
 
-	strFromBytes := string(out[:])
-	branches := strings.Split(strFromBytes, "\n")
+	fromBytes := string(out[:])
+	branches := strings.Split(fromBytes, "\n")
 
 	// Last element will be an empty string, let's just drop it here
 	return branches[:len(branches)-1]
+}
+
+func getCurrentBranchName() string {
+	out, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").CombinedOutput()
+	if err != nil {
+		log.Fatalf("Error getting current branch: %v", err)
+	}
+
+	return string(out[:])
+}
+
+// Returns the output of the `git switch` command
+func switchBranch(branchName string) string {
+	out, err := exec.Command("git", "switch", branchName).CombinedOutput()
+	if err != nil {
+		log.Fatalf("Error switching branch: %v", err)
+	}
+
+	return string(out[:])
 }
