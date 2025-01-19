@@ -2,7 +2,7 @@
 
 A super simple program that allows you to interactively switch to a local branch matching a certain pattern. By default, this pattern is your username.
 
-## Why does this exist?
+##  Why does this exist?
 
 I'd often find myself repeating these steps:
 
