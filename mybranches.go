@@ -82,9 +82,9 @@ func (m model) View() string {
 	return builder.String()
 }
 
-func initialState() model {
+func initialState(branches []string) model {
 	return model{
-		branches: findBranches(getUsernamePattern()),
+		branches: branches,
 	}
 }
 
@@ -138,7 +138,15 @@ func switchBranch(branchName string) string {
 }
 
 func main() {
-	program := tea.NewProgram(initialState())
+	pattern := getUsernamePattern()
+	branches := findBranches(pattern)
+
+	if len(branches) == 0 {
+		fmt.Printf("Couldn't find any branches containing '%s'\n", pattern)
+		return
+	}
+
+	program := tea.NewProgram(initialState(branches))
 	m, err := program.Run()
 
 	if err != nil {
