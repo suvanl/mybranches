@@ -12,9 +12,9 @@ import (
 )
 
 type model struct {
-	branches    []string
-	cursorIndex int
-	selected    string
+	branches       []string
+	cursorIndex    int
+	selectedBranch string
 }
 
 const deselectedIndicator = "( )"
@@ -44,7 +44,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "enter", " ": // spacebar is represented by space char
-			m.selected = m.branches[m.cursorIndex]
+			m.selectedBranch = m.branches[m.cursorIndex]
 			return m, tea.Quit
 		}
 	}
@@ -137,8 +137,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	if m, ok := m.(model); ok && m.selected != "" {
-		switchOut := switchBranch(m.selected)
+	if m, ok := m.(model); ok && m.selectedBranch != "" {
+		switchOut := switchBranch(m.selectedBranch)
 		fmt.Printf("\n---\n\n%s\n", switchOut)
 	}
 }
