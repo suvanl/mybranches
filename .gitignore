@@ -22,8 +22,8 @@
 go.work
 go.work.sum
 
-# Build output
-/build
+# Build/binary output folder
+/bin
 
 # env file
 .env
