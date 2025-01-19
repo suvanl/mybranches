@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type model struct {
@@ -20,6 +21,13 @@ type model struct {
 
 const deselectedIndicator = "( )"
 const selectedIndicator = "(*)"
+
+var (
+	selectedStyle      = lipgloss.NewStyle().Foreground(lipgloss.Color("6"))
+	currentStyle       = lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
+	helpStylePrimary   = lipgloss.NewStyle().Foreground(lipgloss.Color("7"))
+	helpStyleSecondary = lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
+)
 
 func (m model) Init() tea.Cmd {
 	return nil
@@ -62,7 +70,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 // There's no need to implement redrawing logic - bubbletea takes care of redrawing for us.
 func (m model) View() string {
 	builder := strings.Builder{}
-	fmt.Fprintf(&builder, "Branches containing '%s'\n\n", getUsernamePattern())
+	fmt.Fprintf(&builder, "Branches containing '%s'\n\n", selectedStyle.Render(getUsernamePattern()))
 
 	for i := range m.branches {
 		if m.cursorIndex == i {
@@ -72,13 +80,13 @@ func (m model) View() string {
 		}
 		builder.WriteString(m.branches[i])
 		if getCurrentBranchName() == m.branches[i] {
-			builder.WriteString(" (current)")
+			builder.WriteString(currentStyle.Render(" (current)"))
 		}
 
 		builder.WriteString("\n")
 	}
 
-	builder.WriteString("\n(press q to quit)\n")
+	builder.WriteString(buildHelpFooter())
 
 	return builder.String()
 }
@@ -87,6 +95,20 @@ func initialState(branches []string) model {
 	return model{
 		branches: branches,
 	}
+}
+
+func formatHelpSection(key string, value string) string {
+	return helpStylePrimary.Render(key) + " " + helpStyleSecondary.Render(value)
+}
+
+func buildHelpFooter() string {
+	sections := []string{
+		formatHelpSection("↑/k", "up"),
+		formatHelpSection("↓/j", "down"),
+		formatHelpSection("q", "quit"),
+	}
+
+	return "\n" + strings.Join(sections, helpStyleSecondary.Render(" • ")) + "\n"
 }
 
 func getUsernamePattern() string {
