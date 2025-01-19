@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"os/exec"
 	"os/user"
+	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -89,7 +92,7 @@ func main() {
 
 func initialState() model {
 	return model{
-		branches: []string{"sample1", "idk", "suvan/test_new"},
+		branches: findBranches(getUsernamePattern()),
 		selected: make(map[int]struct{}),
 	}
 }
@@ -107,4 +110,18 @@ func getUsernamePattern() string {
 	// another char, such as `-` may be commonplace too, so we'll return the username without any
 	// trailing chars for now.
 	return user.Username
+}
+
+func findBranches(pattern string) []string {
+	globPattern := fmt.Sprintf("%s*", pattern)
+	out, err := exec.Command("git", "branch", "--list", globPattern, "--format", "%(refname:short)").CombinedOutput()
+	if err != nil {
+		log.Fatalf("Error finding branches: %v", err)
+	}
+
+	strFromBytes := string(out[:])
+	branches := strings.Split(strFromBytes, "\n")
+
+	// Last element will be an empty string, let's just drop it here
+	return branches[:len(branches)-1]
 }
