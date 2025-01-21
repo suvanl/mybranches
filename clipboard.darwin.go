@@ -4,7 +4,7 @@ import "os/exec"
 
 /* platform-specific clipboard operations for darwin (macOS) */
 
-func CopyToClipboard(text string) error {
+func copyToClipboard(text string) error {
 	echo := exec.Command("echo", text)
 	pbcopy := exec.Command("pbcopy")
 

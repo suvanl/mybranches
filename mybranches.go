@@ -57,7 +57,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "c":
-			err := CopyToClipboard(m.branches[m.cursorIndex])
+			err := copyToClipboard(m.branches[m.cursorIndex])
 			if err != nil {
 				log.Fatal(err)
 				return m, tea.Quit
