@@ -56,6 +56,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cursorIndex++
 			}
 
+		case "c":
+			err := CopyToClipboard(m.branches[m.cursorIndex])
+			if err != nil {
+				log.Fatal(err)
+				return m, tea.Quit
+			}
+
 		case "enter", " ": // spacebar is represented by space char
 			m.selectedBranch = m.branches[m.cursorIndex]
 			return m, tea.Quit
@@ -105,6 +112,7 @@ func buildHelpFooter() string {
 	sections := []string{
 		formatHelpSection("↑/k", "up"),
 		formatHelpSection("↓/j", "down"),
+		formatHelpSection("c", "copy"),
 		formatHelpSection("q", "quit"),
 	}
 
