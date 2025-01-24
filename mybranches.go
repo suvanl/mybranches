@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -12,11 +11,6 @@ import (
 func main() {
 	pattern := flag.String("pattern", getUsernamePattern(), "Custom pattern to use. Defaults to your username.")
 	flag.Parse()
-
-	if strings.TrimSpace(*pattern) == "" {
-		fmt.Println("pattern flag cannot be blank")
-		return
-	}
 
 	branches := findBranches(*pattern)
 	if len(branches) == 0 {
