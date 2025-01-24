@@ -10,19 +10,17 @@ import (
 )
 
 func main() {
-	patternFlag := flag.String("pattern", getUsernamePattern(), "Custom pattern to use. Defaults to your username.")
+	pattern := flag.String("pattern", getUsernamePattern(), "Custom pattern to use. Defaults to your username.")
 	flag.Parse()
 
-	pattern := *patternFlag
-
-	if strings.TrimSpace(pattern) == "" {
+	if strings.TrimSpace(*pattern) == "" {
 		fmt.Println("pattern flag cannot be blank")
 		return
 	}
 
-	branches := findBranches(pattern)
+	branches := findBranches(*pattern)
 	if len(branches) == 0 {
-		fmt.Printf("Couldn't find any branches containing '%s'\n", pattern)
+		fmt.Printf("Couldn't find any branches containing '%s'\n", *pattern)
 		return
 	}
 
