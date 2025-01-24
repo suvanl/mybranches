@@ -4,7 +4,7 @@ A super simple program that allows you to interactively switch to a local branch
 
 ## Why does this exist?
 
-I'd often find myself repeating these steps:
+While working on projects with multiple collaborators, I'd often find myself repeating these steps when trying to find one of my branches:
 
 - have a number of local branches
 - run `git mybranches` (alias for `git branch --list "<username>*"`)
