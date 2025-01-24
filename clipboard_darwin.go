@@ -2,9 +2,9 @@ package main
 
 import "os/exec"
 
-/* platform-specific clipboard operations for darwin (macOS) */
+type DarwinClipboard struct{}
 
-func copyToClipboard(text string) error {
+func (c DarwinClipboard) Copy(text string) error {
 	echo := exec.Command("echo", text)
 	pbcopy := exec.Command("pbcopy")
 
