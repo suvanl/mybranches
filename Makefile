@@ -1,2 +1,2 @@
 build:
-	go build -o build/mybranches mybranches.go
+	go build -o bin/mybranches .
