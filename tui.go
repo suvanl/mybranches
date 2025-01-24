@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"log"
+	"slices"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
+// UI state model
 type model struct {
 	branches       []string
 	cursorIndex    int
@@ -112,8 +114,12 @@ func buildHelpFooter() string {
 	sections := []string{
 		formatHelpSection("↑/k", "up"),
 		formatHelpSection("↓/j", "down"),
-		formatHelpSection("c", "copy"),
 		formatHelpSection("q", "quit"),
+	}
+
+	if getPlatformClipboard() != nil {
+		// "quit" should be last, so make "copy" 2nd last
+		sections = slices.Insert(sections, len(sections)-1, formatHelpSection("c", "copy"))
 	}
 
 	return "\n" + strings.Join(sections, helpStyleSecondary.Render(" • ")) + "\n"

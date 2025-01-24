@@ -15,12 +15,6 @@ type Clipboard interface {
 	Copy(text string) error
 }
 
-func isClipboardSupported() bool {
-	os := runtime.GOOS
-	// Clipboard methods are currently only supported on darwin (macOS)
-	return os == "darwin"
-}
-
 func getPlatformClipboard() Clipboard {
 	os := runtime.GOOS
 
