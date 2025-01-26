@@ -1,7 +1,5 @@
 package main
 
-import "runtime"
-
 type ClipboardError string
 
 const ErrClipboardNotSupported = ClipboardError("clipboard not supported")
@@ -15,10 +13,8 @@ type Clipboard interface {
 	Copy(text string) error
 }
 
-func getPlatformClipboard() Clipboard {
-	os := runtime.GOOS
-
-	if os == "darwin" {
+func getPlatformClipboard(osName string) Clipboard {
+	if osName == "darwin" {
 		return DarwinClipboard{}
 	}
 

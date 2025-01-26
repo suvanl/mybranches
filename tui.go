@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"runtime"
 	"slices"
 	"strings"
 
@@ -117,7 +118,8 @@ func buildHelpFooter() string {
 		formatHelpSection("q", "quit"),
 	}
 
-	if getPlatformClipboard() != nil {
+	os := runtime.GOOS
+	if getPlatformClipboard(os) != nil {
 		// "quit" should be last, so make "copy" 2nd last
 		sections = slices.Insert(sections, len(sections)-1, formatHelpSection("c", "copy"))
 	}
@@ -126,7 +128,8 @@ func buildHelpFooter() string {
 }
 
 func handleCopy(text string) error {
-	clipboard := getPlatformClipboard()
+	os := runtime.GOOS
+	clipboard := getPlatformClipboard(os)
 	if clipboard == nil {
 		return ErrClipboardNotSupported
 	}
