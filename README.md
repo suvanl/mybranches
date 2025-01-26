@@ -28,3 +28,6 @@ mybranches
 
 **Optional flags**:
 - `--pattern`: specify a custom pattern. This gets passed to `git branch --list <pattern>*`. Defaults to your system username.
+
+> [!IMPORTANT]
+> The "copy to clipboard" feature is currently only supported on macOS.
