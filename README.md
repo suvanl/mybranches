@@ -1,5 +1,7 @@
 # mybranches
 
+![](https://github.com/user-attachments/assets/aee520f2-d710-4014-babb-09aa34fb2d5d)
+
 A super simple program that allows you to interactively switch to a local branch matching a certain pattern. By default, this pattern is your username.
 
 ## Why does this exist?
