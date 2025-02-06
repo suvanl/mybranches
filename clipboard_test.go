@@ -20,11 +20,12 @@ func TestPlatformSpecificClipboardImplementation(t *testing.T) {
 		}
 	})
 
-	t.Run("when OS is windows, clipboard is not supported", func(t *testing.T) {
+	t.Run("when OS is windows, clipboard is supported", func(t *testing.T) {
+		want := WindowsClipboard{}
 		got := getPlatformClipboard("windows")
 
-		if got != nil {
-			t.Errorf("got %q, want nil", got)
+		if got != want {
+			t.Errorf("got %q, want %q", got, want)
 		}
 	})
 }
