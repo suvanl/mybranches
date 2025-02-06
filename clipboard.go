@@ -14,9 +14,14 @@ type Clipboard interface {
 }
 
 func getPlatformClipboard(osName string) Clipboard {
-	if osName == "darwin" {
+	switch osName {
+	case "darwin":
 		return DarwinClipboard{}
-	}
 
-	return nil
+	case "windows":
+		return WindowsClipboard{}
+
+	default:
+		return nil
+	}
 }
