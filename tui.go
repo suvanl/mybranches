@@ -72,10 +72,8 @@ func (m model) mainView() string {
 
 	builder := strings.Builder{}
 
+	// pattern flag defaults to username, so this should always have a value
 	pattern := flag.Lookup("pattern").Value.String()
-	if pattern == "" {
-		pattern = getUsernamePattern()
-	}
 
 	fmt.Fprintf(&builder, "Branches containing '%s'\n\n", selectedStyle.Render(pattern))
 
