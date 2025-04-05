@@ -26,8 +26,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	if m, ok := m.(model); ok && m.selectedBranch != "" {
-		switchOut := switchBranch(m.selectedBranch)
+	uiModel, ok := m.(model)
+	selectedBranch := uiModel.selectedBranch
+	deletableBranch := uiModel.deletableBranch
+
+	if !ok {
+		fmt.Println("m is not of type model")
+		return
+	}
+
+	if selectedBranch != "" {
+		switchOut := switchBranch(selectedBranch)
 		fmt.Printf("\n---\n\n%s\n", switchOut)
+		return
+	}
+
+	if deletableBranch != "" {
+		deleteOut := deleteBranch(deletableBranch)
+		fmt.Printf("\n---\n\n%s\n", deleteOut)
+		return
 	}
 }

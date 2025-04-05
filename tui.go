@@ -16,13 +16,22 @@ type model struct {
 	branches       []string
 	cursorIndex    int
 	selectedBranch string
-	deleteBranch   string
+
+	selectedForDeletionBranch string
+	deletableBranch           string
 }
 
 var (
-	selectedStyle      = lipgloss.NewStyle().Foreground(lipgloss.Color("6"))
-	currentStyle       = lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
-	helpStylePrimary   = lipgloss.NewStyle().Foreground(lipgloss.Color("7"))
+	// Style for reiterating the selected item
+	selectedStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("6"))
+
+	// Style for the '(current)' badge next to the name of the branch the user is currently on
+	currentStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("2"))
+
+	// Style for primary items in the help footer
+	helpStylePrimary = lipgloss.NewStyle().Foreground(lipgloss.Color("7"))
+
+	// Style for secondary items in the help footer
 	helpStyleSecondary = lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
 )
 
@@ -35,7 +44,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Quit
 	}
 
-	isInDeleteMode := m.deleteBranch != ""
+	isInDeleteMode := m.selectedForDeletionBranch != ""
 	if isInDeleteMode {
 		return m.handleDeleteBranchViewUpdate(msg)
 	}
@@ -47,7 +56,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 //
 // There's no need to implement redrawing logic - bubbletea takes care of redrawing for us.
 func (m model) View() string {
-	if m.deleteBranch != "" {
+	if m.selectedForDeletionBranch != "" {
 		return m.deleteBranchView()
 	}
 
@@ -82,7 +91,20 @@ func (m model) mainView() string {
 
 func (m model) deleteBranchView() string {
 	builder := strings.Builder{}
-	fmt.Fprintf(&builder, "\nDelete '%s'?\n\n", selectedStyle.Render(m.deleteBranch))
+
+	if getCurrentBranchName() == m.selectedForDeletionBranch {
+		fmt.Fprint(&builder, "\n:( Can't delete the branch you're currently on. Switch to a different branch first.\n\n")
+
+		footerSections := []string{
+			formatHelpSection("n", "go back"),
+			formatHelpSection("q", "quit"),
+		}
+		builder.WriteString(strings.Join(footerSections, helpStyleSecondary.Render(" • ")) + "\n")
+
+		return builder.String()
+	}
+
+	fmt.Fprintf(&builder, "\nDelete '%s'?\n\n", selectedStyle.Render(m.selectedForDeletionBranch))
 
 	builder.WriteString(buildDeleteHelpFooter())
 
@@ -120,7 +142,7 @@ func (m model) handleMainViewUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "d":
-			m.deleteBranch = m.branches[m.cursorIndex]
+			m.selectedForDeletionBranch = m.branches[m.cursorIndex]
 
 		case "enter", " ": // spacebar is represented by space char
 			m.selectedBranch = m.branches[m.cursorIndex]
@@ -139,7 +161,16 @@ func (m model) handleDeleteBranchViewUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case "n":
-			m.deleteBranch = ""
+			m.selectedForDeletionBranch = ""
+
+		case "y":
+			// Prevent sending the deletion request to git if it's guaranteed to never succeed.
+			// Specifically, if the branch we're currently on is the branch we're trying to delete.
+			isDeletable := getCurrentBranchName() != m.selectedForDeletionBranch
+			if isDeletable {
+				m.deletableBranch = m.selectedForDeletionBranch
+				return m, tea.Quit
+			}
 		}
 	}
 
