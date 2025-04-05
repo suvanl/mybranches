@@ -43,6 +43,16 @@ func switchBranch(branchName string) string {
 	return string(out[:])
 }
 
+// Returns the output of the `git branch -D <branch>` command
+func deleteBranch(branchName string) string {
+	out, err := exec.Command("git", "branch", "-D", branchName).CombinedOutput()
+	if err != nil {
+		log.Fatalf("Error deleting branch: %v", err)
+	}
+
+	return string(out[:])
+}
+
 func getUsernamePattern() string {
 	user, err := user.Current()
 

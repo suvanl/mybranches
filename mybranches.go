@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -26,8 +27,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	if m, ok := m.(model); ok && m.selectedBranch != "" {
-		switchOut := switchBranch(m.selectedBranch)
+	uiModel, ok := m.(model)
+	selectedBranch := uiModel.selectedBranch
+	deletionRequested := uiModel.deletionContext.shouldDelete
+
+	if !ok {
+		log.Fatal("m is not of type model")
+		return
+	}
+
+	if selectedBranch != "" {
+		switchOut := switchBranch(selectedBranch)
 		fmt.Printf("\n---\n\n%s\n", switchOut)
+		return
+	}
+
+	if deletionRequested {
+		deleteOut := deleteBranch(uiModel.deletionContext.branchName)
+		fmt.Printf("\n---\n\n%s\n", deleteOut)
+		return
 	}
 }
