@@ -16,6 +16,7 @@ type model struct {
 	branches       []string
 	cursorIndex    int
 	selectedBranch string
+	deleteBranch   string
 }
 
 var (
@@ -34,6 +35,61 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Quit
 	}
 
+	isInDeleteMode := m.deleteBranch != ""
+	if isInDeleteMode {
+		return m.handleDeleteBranchViewUpdate(msg)
+	}
+
+	return m.handleMainViewUpdate(msg)
+}
+
+// The UI is just a string that gets updated by the Update method.
+//
+// There's no need to implement redrawing logic - bubbletea takes care of redrawing for us.
+func (m model) View() string {
+	if m.deleteBranch != "" {
+		return m.deleteBranchView()
+	}
+
+	return m.mainView()
+}
+
+func (m model) mainView() string {
+	const deselectedIndicator string = "( )"
+	const selectedIndicator string = "(*)"
+
+	builder := strings.Builder{}
+	fmt.Fprintf(&builder, "Branches containing '%s'\n\n", selectedStyle.Render(getUsernamePattern()))
+
+	for i := range m.branches {
+		if m.cursorIndex == i {
+			builder.WriteString(selectedIndicator + " ")
+		} else {
+			builder.WriteString(deselectedIndicator + " ")
+		}
+		builder.WriteString(m.branches[i])
+		if getCurrentBranchName() == m.branches[i] {
+			builder.WriteString(currentStyle.Render(" (current)"))
+		}
+
+		builder.WriteString("\n")
+	}
+
+	builder.WriteString(buildHelpFooter())
+
+	return builder.String()
+}
+
+func (m model) deleteBranchView() string {
+	builder := strings.Builder{}
+	fmt.Fprintf(&builder, "\nDelete '%s'?\n\n", selectedStyle.Render(m.deleteBranch))
+
+	builder.WriteString(buildDeleteHelpFooter())
+
+	return builder.String()
+}
+
+func (m model) handleMainViewUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -63,6 +119,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Quit
 			}
 
+		case "d":
+			m.deleteBranch = m.branches[m.cursorIndex]
+
 		case "enter", " ": // spacebar is represented by space char
 			m.selectedBranch = m.branches[m.cursorIndex]
 			return m, tea.Quit
@@ -72,33 +131,19 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-// The UI is just a string that gets updated by the Update method.
-//
-// There's no need to implement redrawing logic - bubbletea takes care of redrawing for us.
-func (m model) View() string {
-	const deselectedIndicator string = "( )"
-	const selectedIndicator string = "(*)"
+func (m model) handleDeleteBranchViewUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "ctrl+c", "q":
+			return m, tea.Quit
 
-	builder := strings.Builder{}
-	fmt.Fprintf(&builder, "Branches containing '%s'\n\n", selectedStyle.Render(getUsernamePattern()))
-
-	for i := range m.branches {
-		if m.cursorIndex == i {
-			builder.WriteString(selectedIndicator + " ")
-		} else {
-			builder.WriteString(deselectedIndicator + " ")
+		case "n":
+			m.deleteBranch = ""
 		}
-		builder.WriteString(m.branches[i])
-		if getCurrentBranchName() == m.branches[i] {
-			builder.WriteString(currentStyle.Render(" (current)"))
-		}
-
-		builder.WriteString("\n")
 	}
 
-	builder.WriteString(buildHelpFooter())
-
-	return builder.String()
+	return m, nil
 }
 
 func initialState(branches []string) model {
@@ -115,16 +160,27 @@ func buildHelpFooter() string {
 	sections := []string{
 		formatHelpSection("↑/k", "up"),
 		formatHelpSection("↓/j", "down"),
+		formatHelpSection("d", "delete"),
 		formatHelpSection("q", "quit"),
 	}
 
 	os := runtime.GOOS
 	if getPlatformClipboard(os) != nil {
-		// "quit" should be last, so make "copy" 2nd last
-		sections = slices.Insert(sections, len(sections)-1, formatHelpSection("c", "copy"))
+		// force "copy" to be before "delete"
+		sections = slices.Insert(sections, len(sections)-2, formatHelpSection("c", "copy"))
 	}
 
 	return "\n" + strings.Join(sections, helpStyleSecondary.Render(" • ")) + "\n"
+}
+
+func buildDeleteHelpFooter() string {
+	sections := []string{
+		formatHelpSection("y", "yes"),
+		formatHelpSection("n", "no"),
+		formatHelpSection("q", "quit"),
+	}
+
+	return strings.Join(sections, helpStyleSecondary.Render(" • ")) + "\n"
 }
 
 func handleCopy(text string) error {
