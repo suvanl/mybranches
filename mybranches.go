@@ -28,7 +28,7 @@ func main() {
 
 	uiModel, ok := m.(model)
 	selectedBranch := uiModel.selectedBranch
-	deletableBranch := uiModel.deletableBranch
+	deletableBranch := uiModel.deletionContext.deletableBranch
 
 	if !ok {
 		fmt.Println("m is not of type model")
