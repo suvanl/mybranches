@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"runtime"
@@ -70,7 +71,11 @@ func (m model) mainView() string {
 	const selectedIndicator string = "(*)"
 
 	builder := strings.Builder{}
-	fmt.Fprintf(&builder, "Branches containing '%s'\n\n", selectedStyle.Render(getUsernamePattern()))
+
+	// pattern flag defaults to username, so this should always have a value
+	pattern := flag.Lookup("pattern").Value.String()
+
+	fmt.Fprintf(&builder, "Branches containing '%s'\n\n", selectedStyle.Render(pattern))
 
 	for i := range m.branches {
 		if m.cursorIndex == i {
