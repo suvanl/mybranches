@@ -37,12 +37,12 @@ var (
 )
 
 func InitialState() model {
-	s := spinner.New()
-	s.Spinner = spinner.Dot
-	s.Style = spinnerStyle
+	spinnerInit := spinner.New()
+	spinnerInit.Spinner = spinner.Dot
+	spinnerInit.Style = spinnerStyle
 
 	return model{
-		spinner: s,
+		spinner: spinnerInit,
 		stage:   FetchPrune,
 	}
 }
