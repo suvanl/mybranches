@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -31,7 +32,7 @@ func main() {
 	deletionRequested := uiModel.deletionContext.shouldDelete
 
 	if !ok {
-		fmt.Println("m is not of type model")
+		log.Fatal("m is not of type model")
 		return
 	}
 
