@@ -28,7 +28,7 @@ func main() {
 
 	uiModel, ok := m.(model)
 	selectedBranch := uiModel.selectedBranch
-	deletableBranch := uiModel.deletionContext.deletableBranch
+	deletionRequested := uiModel.deletionContext.shouldDelete
 
 	if !ok {
 		fmt.Println("m is not of type model")
@@ -41,8 +41,8 @@ func main() {
 		return
 	}
 
-	if deletableBranch != "" {
-		deleteOut := deleteBranch(deletableBranch)
+	if deletionRequested {
+		deleteOut := deleteBranch(uiModel.deletionContext.branchName)
 		fmt.Printf("\n---\n\n%s\n", deleteOut)
 		return
 	}

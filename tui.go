@@ -18,8 +18,8 @@ type model struct {
 	selectedBranch string
 
 	deletionContext struct {
-		selectedForDeletionBranch string
-		deletableBranch           string
+		branchName   string
+		shouldDelete bool
 	}
 }
 
@@ -46,7 +46,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Quit
 	}
 
-	isInDeleteMode := m.deletionContext.selectedForDeletionBranch != ""
+	isInDeleteMode := m.deletionContext.branchName != ""
 	if isInDeleteMode {
 		return m.handleDeleteBranchViewUpdate(msg)
 	}
@@ -58,7 +58,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 //
 // There's no need to implement redrawing logic - bubbletea takes care of redrawing for us.
 func (m model) View() string {
-	if m.deletionContext.selectedForDeletionBranch != "" {
+	if m.deletionContext.branchName != "" {
 		return m.deleteBranchView()
 	}
 
@@ -94,7 +94,7 @@ func (m model) mainView() string {
 func (m model) deleteBranchView() string {
 	builder := strings.Builder{}
 
-	if getCurrentBranchName() == m.deletionContext.selectedForDeletionBranch {
+	if getCurrentBranchName() == m.deletionContext.branchName {
 		fmt.Fprint(&builder, "\n:( Can't delete the branch you're currently on. Switch to a different branch first.\n\n")
 
 		footerSections := []string{
@@ -106,7 +106,7 @@ func (m model) deleteBranchView() string {
 		return builder.String()
 	}
 
-	fmt.Fprintf(&builder, "\nDelete '%s'?\n\n", selectedStyle.Render(m.deletionContext.selectedForDeletionBranch))
+	fmt.Fprintf(&builder, "\nDelete '%s'?\n\n", selectedStyle.Render(m.deletionContext.branchName))
 
 	builder.WriteString(buildDeleteHelpFooter())
 
@@ -144,7 +144,7 @@ func (m model) handleMainViewUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "d":
-			m.deletionContext.selectedForDeletionBranch = m.branches[m.cursorIndex]
+			m.deletionContext.branchName = m.branches[m.cursorIndex]
 
 		case "enter", " ": // spacebar is represented by space char
 			m.selectedBranch = m.branches[m.cursorIndex]
@@ -163,14 +163,14 @@ func (m model) handleDeleteBranchViewUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 
 		case "n":
-			m.deletionContext.selectedForDeletionBranch = ""
+			m.deletionContext.branchName = ""
 
 		case "y":
 			// Prevent sending the deletion request to git if it's guaranteed to never succeed.
 			// Specifically, if the branch we're currently on is the branch we're trying to delete.
-			isDeletable := getCurrentBranchName() != m.deletionContext.selectedForDeletionBranch
+			isDeletable := getCurrentBranchName() != m.deletionContext.branchName
 			if isDeletable {
-				m.deletionContext.deletableBranch = m.deletionContext.selectedForDeletionBranch
+				m.deletionContext.shouldDelete = true
 				return m, tea.Quit
 			}
 		}
