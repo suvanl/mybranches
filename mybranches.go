@@ -19,7 +19,7 @@ func main() {
 	if *cleanupFlag {
 		hasCustomPatternFlag := *patternFlag != getUsernamePattern()
 		if hasCustomPatternFlag {
-			fmt.Println("  ⚠️ Specified -pattern flag with -cleanup. The cleanup flag takes precedence; the pattern flag will be ignored.")
+			fmt.Println("  ⚠️ Ignoring --pattern flag because --cleanup flag was set to true")
 		}
 
 		// Run cleanup program
