@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-type cleanupStage int
+type cleanUpStage int
 type stageError string
 
 const errStageMappingError = stageError("Failed to map CleanupStage to message")
@@ -19,14 +19,14 @@ func (e stageError) Error() string {
 }
 
 const (
-	FetchPrune cleanupStage = iota
+	FetchPrune cleanUpStage = iota
 	Find
 	Delete
 )
 
 type model struct {
 	spinner  spinner.Model
-	stage    cleanupStage
+	stage    cleanUpStage
 	quitting bool
 	err      error
 }
@@ -98,7 +98,7 @@ func (m model) View() string {
 	return builder.String()
 }
 
-func mapStageToMessage(stage cleanupStage) (string, error) {
+func mapStageToMessage(stage cleanUpStage) (string, error) {
 	var message string
 
 	switch stage {
