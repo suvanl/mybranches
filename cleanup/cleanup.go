@@ -13,6 +13,15 @@ func (e errMsg) Error() string {
 	return e.err.Error()
 }
 
+type cleanUpStage int
+
+const (
+	FetchPrune cleanUpStage = iota
+	Find
+	Delete
+	Done
+)
+
 func startStage(stage cleanUpStage) tea.Cmd {
 	switch stage {
 	case FetchPrune:
