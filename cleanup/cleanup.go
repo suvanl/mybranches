@@ -17,7 +17,6 @@ type cleanUpStage int
 
 const (
 	FetchPrune cleanUpStage = iota
-	Find
 	Delete
 	Done
 )
@@ -30,12 +29,6 @@ func startStage(stage cleanUpStage) tea.Cmd {
 			if err != nil {
 				return errMsg{err}
 			}
-			return getNextStage(stage)
-		}
-
-	case Find:
-		return func() tea.Msg {
-			time.Sleep(time.Second)
 			return getNextStage(stage)
 		}
 
@@ -54,8 +47,6 @@ func getNextStage(currentStage cleanUpStage) cleanUpStage {
 
 	switch currentStage {
 	case FetchPrune:
-		nextStage = Find
-	case Find:
 		nextStage = Delete
 	case Delete:
 		nextStage = Done

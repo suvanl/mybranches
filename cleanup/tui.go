@@ -106,8 +106,6 @@ func mapStageToMessage(stage cleanUpStage) (string, error) {
 	switch stage {
 	case FetchPrune:
 		message = "Fetching remote branches"
-	case Find:
-		message = "Finding local branches not on remote"
 	case Delete:
 		message = "Deleting local branches not on remote"
 	case Done:
