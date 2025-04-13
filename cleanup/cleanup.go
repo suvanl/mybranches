@@ -19,7 +19,7 @@ const (
 	Done
 )
 
-func startStage(stage cleanUpStage) tea.Cmd {
+func startStage(stage cleanUpStage, dryRun bool) tea.Cmd {
 	switch stage {
 	case FetchPrune:
 		return func() tea.Msg {
@@ -32,7 +32,6 @@ func startStage(stage cleanUpStage) tea.Cmd {
 
 	case Delete:
 		return func() tea.Msg {
-			dryRun := true
 			_, err := git.DeleteBranchesNotOnRemote(dryRun)
 			if err != nil {
 				return errMsg{err}

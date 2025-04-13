@@ -22,6 +22,7 @@ type model struct {
 	stage    cleanUpStage
 	quitting bool
 	err      error
+	dryRun   bool
 }
 
 var (
@@ -29,7 +30,7 @@ var (
 	helpStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
 )
 
-func InitialState() model {
+func InitialState(dryRun bool) model {
 	spinnerInit := spinner.New()
 	spinnerInit.Spinner = spinner.Dot
 	spinnerInit.Style = spinnerStyle
@@ -37,11 +38,12 @@ func InitialState() model {
 	return model{
 		spinner: spinnerInit,
 		stage:   FetchPrune,
+		dryRun:  dryRun,
 	}
 }
 
 func (m model) Init() tea.Cmd {
-	return tea.Batch(m.spinner.Tick, startStage(m.stage))
+	return tea.Batch(m.spinner.Tick, startStage(m.stage, m.dryRun))
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -67,7 +69,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 
-		return m, startStage(m.stage)
+		return m, startStage(m.stage, m.dryRun)
 
 	default:
 		var cmd tea.Cmd

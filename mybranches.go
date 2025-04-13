@@ -14,6 +14,7 @@ import (
 func main() {
 	patternFlag := flag.String("pattern", getUsernamePattern(), "Custom pattern to use. Defaults to your username.")
 	cleanupFlag := flag.Bool("cleanup", false, "Delete all local branches that aren't on remote")
+	dryRunFlag := flag.Bool("dry-run", false, "Run cleanup without actually deleting branches")
 
 	flag.Parse()
 
@@ -24,7 +25,7 @@ func main() {
 		}
 
 		// Run cleanup program
-		program := tea.NewProgram(cleanup.InitialState())
+		program := tea.NewProgram(cleanup.InitialState(*dryRunFlag))
 		_, err := program.Run()
 
 		if err != nil {
