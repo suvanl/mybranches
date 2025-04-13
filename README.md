@@ -29,7 +29,8 @@ mybranches
 ```
 
 **Optional flags**:
-- `--pattern`: specify a custom pattern. This gets passed to `git branch --list <pattern>*`. Defaults to your system username.
+- `--pattern`: Specify a custom pattern. This gets passed to `git branch --list <pattern>*`. Defaults to your system username.
+- `--cleanup`: Run the cleanup program. This will delete all local branches gone from remote.
 
 > [!IMPORTANT]
 > The "copy to clipboard" feature is currently only supported on macOS and Windows.
