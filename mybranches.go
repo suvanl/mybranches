@@ -7,15 +7,36 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/suvanl/mybranches/cleanup"
 )
 
 func main() {
-	pattern := flag.String("pattern", getUsernamePattern(), "Custom pattern to use. Defaults to your username.")
+	patternFlag := flag.String("pattern", getUsernamePattern(), "Custom pattern to use. Defaults to your username.")
+	cleanupFlag := flag.Bool("cleanup", false, "Delete all local branches that aren't on remote")
+
 	flag.Parse()
 
-	branches := findBranches(*pattern)
+	if *cleanupFlag {
+		hasCustomPatternFlag := *patternFlag != getUsernamePattern()
+		if hasCustomPatternFlag {
+			fmt.Println("  ⚠️ Ignoring --pattern flag because --cleanup flag was set to true")
+		}
+
+		// Run cleanup program
+		program := tea.NewProgram(cleanup.InitialState())
+		_, err := program.Run()
+
+		if err != nil {
+			fmt.Printf("Something went wrong: %v", err)
+			os.Exit(1)
+		}
+
+		return
+	}
+
+	branches := findBranches(*patternFlag)
 	if len(branches) == 0 {
-		fmt.Printf("Couldn't find any branches containing '%s'\n", *pattern)
+		fmt.Printf("Couldn't find any branches containing '%s'\n", *patternFlag)
 		return
 	}
 
