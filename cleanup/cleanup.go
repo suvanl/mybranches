@@ -34,7 +34,13 @@ func startStage(stage cleanUpStage) tea.Cmd {
 
 	case Delete:
 		return func() tea.Msg {
-			time.Sleep(time.Duration(3) * time.Second)
+			time.Sleep(time.Second)
+
+			_, err := git.DeleteBranchesNotOnRemote()
+			if err != nil {
+				return errMsg{err}
+			}
+
 			return getNextStage(stage)
 		}
 	}

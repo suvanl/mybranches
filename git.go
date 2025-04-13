@@ -13,7 +13,7 @@ func findBranches(pattern string) []string {
 	globPattern := fmt.Sprintf("%s*", pattern)
 	out, err := exec.Command("git", "branch", "--list", globPattern, "--format", "%(refname:short)").CombinedOutput()
 	if err != nil {
-		log.Fatalf("Error finding branches: %v", err)
+		log.Fatalf("Error finding branches: %v\n", err)
 	}
 
 	fromBytes := string(out[:])
@@ -26,7 +26,7 @@ func findBranches(pattern string) []string {
 func getCurrentBranchName() string {
 	out, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").CombinedOutput()
 	if err != nil {
-		log.Fatalf("Error getting current branch: %v", err)
+		log.Fatalf("Error getting current branch: %v\n", err)
 	}
 
 	fromBytes := string(out[:])
@@ -37,7 +37,7 @@ func getCurrentBranchName() string {
 func switchBranch(branchName string) string {
 	out, err := exec.Command("git", "switch", branchName).CombinedOutput()
 	if err != nil {
-		log.Fatalf("Error switching branch: %v", err)
+		log.Fatalf("Error switching branch: %v\n", err)
 	}
 
 	return string(out[:])
@@ -47,7 +47,7 @@ func switchBranch(branchName string) string {
 func deleteBranch(branchName string) string {
 	out, err := exec.Command("git", "branch", "-D", branchName).CombinedOutput()
 	if err != nil {
-		log.Fatalf("Error deleting branch: %v", err)
+		log.Fatalf("Error deleting branch: %v\n", err)
 	}
 
 	return string(out[:])
