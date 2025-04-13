@@ -8,6 +8,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/suvanl/mybranches/cleanup"
+	"github.com/suvanl/mybranches/shared/git"
 )
 
 func main() {
@@ -34,7 +35,7 @@ func main() {
 		return
 	}
 
-	branches := findBranches(*patternFlag)
+	branches := git.FindBranches(*patternFlag)
 	if len(branches) == 0 {
 		fmt.Printf("Couldn't find any branches containing '%s'\n", *patternFlag)
 		return
@@ -58,13 +59,13 @@ func main() {
 	}
 
 	if selectedBranch != "" {
-		switchOut := switchBranch(selectedBranch)
+		switchOut := git.SwitchBranch(selectedBranch)
 		fmt.Printf("\n---\n\n%s\n", switchOut)
 		return
 	}
 
 	if deletionRequested {
-		deleteOut := deleteBranch(uiModel.deletionContext.branchName)
+		deleteOut := git.DeleteBranch(uiModel.deletionContext.branchName)
 		fmt.Printf("\n---\n\n%s\n", deleteOut)
 		return
 	}

@@ -2,56 +2,10 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"os/exec"
 	"os/user"
 	"runtime"
 	"strings"
 )
-
-func findBranches(pattern string) []string {
-	globPattern := fmt.Sprintf("%s*", pattern)
-	out, err := exec.Command("git", "branch", "--list", globPattern, "--format", "%(refname:short)").CombinedOutput()
-	if err != nil {
-		log.Fatalf("Error finding branches: %v\n", err)
-	}
-
-	fromBytes := string(out[:])
-	branches := strings.Split(fromBytes, "\n")
-
-	// Last element will be an empty string, let's just drop it here
-	return branches[:len(branches)-1]
-}
-
-func getCurrentBranchName() string {
-	out, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").CombinedOutput()
-	if err != nil {
-		log.Fatalf("Error getting current branch: %v\n", err)
-	}
-
-	fromBytes := string(out[:])
-	return strings.Split(fromBytes, "\n")[0]
-}
-
-// Returns the output of the `git switch` command
-func switchBranch(branchName string) string {
-	out, err := exec.Command("git", "switch", branchName).CombinedOutput()
-	if err != nil {
-		log.Fatalf("Error switching branch: %v\n", err)
-	}
-
-	return string(out[:])
-}
-
-// Returns the output of the `git branch -D <branch>` command
-func deleteBranch(branchName string) string {
-	out, err := exec.Command("git", "branch", "-D", branchName).CombinedOutput()
-	if err != nil {
-		log.Fatalf("Error deleting branch: %v\n", err)
-	}
-
-	return string(out[:])
-}
 
 func getUsernamePattern() string {
 	user, err := user.Current()

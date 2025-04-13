@@ -10,6 +10,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/suvanl/mybranches/shared/git"
 )
 
 // UI state model
@@ -84,7 +85,7 @@ func (m model) mainView() string {
 			builder.WriteString(deselectedIndicator + " ")
 		}
 		builder.WriteString(m.branches[i])
-		if getCurrentBranchName() == m.branches[i] {
+		if git.GetCurrentBranchName() == m.branches[i] {
 			builder.WriteString(currentStyle.Render(" (current)"))
 		}
 
@@ -99,7 +100,7 @@ func (m model) mainView() string {
 func (m model) deleteBranchView() string {
 	builder := strings.Builder{}
 
-	if getCurrentBranchName() == m.deletionContext.branchName {
+	if git.GetCurrentBranchName() == m.deletionContext.branchName {
 		fmt.Fprint(&builder, "\n:( Can't delete the branch you're currently on. Switch to a different branch first.\n\n")
 
 		footerSections := []string{
@@ -173,7 +174,7 @@ func (m model) handleDeleteBranchViewUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "y":
 			// Prevent sending the deletion request to git if it's guaranteed to never succeed.
 			// Specifically, if the branch we're currently on is the branch we're trying to delete.
-			isDeletable := getCurrentBranchName() != m.deletionContext.branchName
+			isDeletable := git.GetCurrentBranchName() != m.deletionContext.branchName
 			if isDeletable {
 				m.deletionContext.shouldDelete = true
 				return m, tea.Quit
