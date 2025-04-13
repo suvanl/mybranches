@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// Returns the default pattern to use when finding/listing branches
 func getUsernamePattern() string {
 	user, err := user.Current()
 
