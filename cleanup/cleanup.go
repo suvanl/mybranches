@@ -1,8 +1,6 @@
 package cleanup
 
 import (
-	"time"
-
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/suvanl/mybranches/shared/git"
 )
@@ -34,9 +32,8 @@ func startStage(stage cleanUpStage) tea.Cmd {
 
 	case Delete:
 		return func() tea.Msg {
-			time.Sleep(time.Second)
-
-			_, err := git.DeleteBranchesNotOnRemote()
+			dryRun := true
+			_, err := git.DeleteBranchesNotOnRemote(dryRun)
 			if err != nil {
 				return errMsg{err}
 			}
