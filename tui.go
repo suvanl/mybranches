@@ -147,14 +147,11 @@ func (m model) handleMainViewUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "c":
 			err := handleCopy(m.branches[m.cursorIndex])
-			if err != nil {
-				if err == ErrClipboardNotSupported {
-					// Do nothing
-				} else {
-					m.quitting = true
-					log.Fatal(err)
-					return m, tea.Quit
-				}
+			// Let ErrClipboardNotSupported fail silently, we shouldn't be showing the 'copy' option if Clipboard functionality isn't supported anyway
+			if err != nil && err != ErrClipboardNotSupported {
+				m.quitting = true
+				log.Fatal(err)
+				return m, tea.Quit
 			}
 
 		case "d":
