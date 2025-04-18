@@ -214,7 +214,7 @@ func buildHelpFooter() string {
 
 func buildDeleteHelpFooter() string {
 	sections := []string{
-		formatHelpSection("y", "yes"),
+		formatHelpSection("y, ↵", "yes"),
 		formatHelpSection("n", "no"),
 		formatHelpSection("q", "quit"),
 	}
