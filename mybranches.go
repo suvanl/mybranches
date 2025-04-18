@@ -61,13 +61,13 @@ func main() {
 
 	if selectedBranch != "" {
 		switchOut := git.SwitchBranch(selectedBranch)
-		fmt.Printf("\n---\n\n%s\n", switchOut)
+		fmt.Printf("\n%s\n", switchOut)
 		return
 	}
 
 	if deletionRequested {
 		deleteOut := git.DeleteBranch(uiModel.deletionContext.branchName)
-		fmt.Printf("\n---\n\n%s\n", deleteOut)
+		fmt.Printf("\n%s\n", deleteOut)
 		return
 	}
 }

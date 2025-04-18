@@ -18,6 +18,7 @@ type model struct {
 	branches       []string
 	cursorIndex    int
 	selectedBranch string
+	quitting       bool
 
 	deletionContext struct {
 		branchName   string
@@ -45,6 +46,7 @@ func (m model) Init() tea.Cmd {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if len(m.branches) == 0 {
+		m.quitting = true
 		return m, tea.Quit
 	}
 
@@ -60,6 +62,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 //
 // There's no need to implement redrawing logic - bubbletea takes care of redrawing for us.
 func (m model) View() string {
+	if m.quitting {
+		return ""
+	}
+
 	if m.deletionContext.branchName != "" {
 		return m.deleteBranchView()
 	}
@@ -126,6 +132,7 @@ func (m model) handleMainViewUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// Standard quit keys
 		case "ctrl+c", "q":
+			m.quitting = true
 			return m, tea.Quit
 
 		case "up", "k":
@@ -143,10 +150,11 @@ func (m model) handleMainViewUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if err != nil {
 				if err == ErrClipboardNotSupported {
 					// Do nothing
+				} else {
+					m.quitting = true
+					log.Fatal(err)
+					return m, tea.Quit
 				}
-
-				log.Fatal(err)
-				return m, tea.Quit
 			}
 
 		case "d":
@@ -154,6 +162,7 @@ func (m model) handleMainViewUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "enter", " ": // spacebar is represented by space char
 			m.selectedBranch = m.branches[m.cursorIndex]
+			m.quitting = true
 			return m, tea.Quit
 		}
 	}
@@ -166,6 +175,7 @@ func (m model) handleDeleteBranchViewUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
+			m.quitting = true
 			return m, tea.Quit
 
 		case "n":
@@ -177,6 +187,7 @@ func (m model) handleDeleteBranchViewUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 			isDeletable := git.GetCurrentBranchName() != m.deletionContext.branchName
 			if isDeletable {
 				m.deletionContext.shouldDelete = true
+				m.quitting = true
 				return m, tea.Quit
 			}
 		}
