@@ -171,7 +171,7 @@ func (m model) handleDeleteBranchViewUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "n":
 			m.deletionContext.branchName = ""
 
-		case "y":
+		case "y", "enter":
 			// Prevent sending the deletion request to git if it's guaranteed to never succeed.
 			// Specifically, if the branch we're currently on is the branch we're trying to delete.
 			isDeletable := git.GetCurrentBranchName() != m.deletionContext.branchName
@@ -214,7 +214,7 @@ func buildHelpFooter() string {
 
 func buildDeleteHelpFooter() string {
 	sections := []string{
-		formatHelpSection("y", "yes"),
+		formatHelpSection("y, ↵", "yes"),
 		formatHelpSection("n", "no"),
 		formatHelpSection("q", "quit"),
 	}
