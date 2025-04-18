@@ -2,7 +2,7 @@
 
 ![](https://github.com/user-attachments/assets/f2efa29f-0017-49a5-8917-f27bc0cc7b9d)
 
-A super simple program that allows you to interactively switch to a local branch matching a certain pattern. By default, this pattern is your username.
+A (probably overengineered) program that allows you to interactively switch to a local branch matching a certain pattern. By default, this pattern is your username.
 
 ## Why does this exist?
 
